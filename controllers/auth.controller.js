@@ -10,7 +10,6 @@ export const register = async (req, res) => {
   const user = await User.create({ name, email, password: hash });
   res.json(user);
 };
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -20,8 +19,32 @@ export const login = async (req, res) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(400).json({ msg: "Wrong password" });
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "7d"
+  });
 
-  res.cookie("token", token, { httpOnly: true });
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,      // ✅ REQUIRED on HTTPS (Render)
+    sameSite: "none",  // ✅ REQUIRED for cross-domain
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+
   res.json({ msg: "Login successful" });
 };
+
+
+// export const login = async (req, res) => {
+//   const { email, password } = req.body;
+//   const user = await User.findOne({ email });
+
+//   if (!user) return res.status(400).json({ msg: "User not found" });
+
+//   const isMatch = await bcrypt.compare(password, user.password);
+//   if (!isMatch) return res.status(400).json({ msg: "Wrong password" });
+
+//   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+//   res.cookie("token", token, { httpOnly: true });
+//   res.json({ msg: "Login successful" });
+// };
