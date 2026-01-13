@@ -21,19 +21,21 @@ app.use(cookieParser());
 // app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://assessment-frontened.onrender.com"
+  "https://assessment-frontened.onrender.com",
+  "https://assessment-frontened1.onrender.com"
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
+  origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(null, false);
     }
   },
   credentials: true
 }));
+
 
 
 // MongoDB connection
